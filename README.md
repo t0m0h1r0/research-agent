@@ -1,15 +1,26 @@
 # research-agent
 
-`research-agent` は、研究プロジェクトに特化したマルチエージェント運用を
-生成するためのメタプロンプト kernel です。このリポジトリは実行済みの
-エージェントプロンプトやプロジェクト固有スクリプトを配布する場所ではなく、
-各プロジェクトが自分の文脈に合わせて `prompts/agents-{env}/`、
-`prompts/skills/`、`docs/00_GLOBAL_RULES.md`、`AGENTS.md` などを生成する
-ための source of truth です。
+`research-agent` is a metaprompt kernel for deploying project-local research
+agent systems. It is not a distribution of ready-made agent prompts or
+project-specific scripts. Instead, each receiving project uses this kernel as
+the source of truth for generating local artifacts such as
+`prompts/agents-{env}/`, `prompts/skills/`, `docs/00_GLOBAL_RULES.md`,
+`docs/03_PROJECT_RULES.md`, and `AGENTS.md`.
 
-## 入手方法
+The intended layout in a receiving project is:
 
-推奨は、利用先プロジェクトの `prompts/meta` に Git submodule として置く方法です。
+```text
+prompts/meta/          # this repository as a Git submodule
+prompts/agents-codex/  # generated locally
+prompts/agents-claude/ # generated locally
+prompts/skills/        # generated locally
+docs/                  # generated or project-maintained local state
+```
+
+## Getting The Kernel
+
+The recommended installation method is to add this repository as a Git
+submodule at `prompts/meta` in the receiving project.
 
 ```sh
 mkdir -p prompts
@@ -19,19 +30,19 @@ git add .gitmodules prompts/meta
 git commit -m "chore: add research-agent metaprompt submodule"
 ```
 
-submodule を含むプロジェクトを新しく clone する場合:
+When cloning a project that already contains the submodule:
 
 ```sh
 git clone --recurse-submodules <project-url>
 ```
 
-既に clone 済みの場合:
+For an existing clone:
 
 ```sh
 git submodule update --init --recursive
 ```
 
-`research-agent` を更新する場合:
+To update the kernel later:
 
 ```sh
 git submodule update --remote prompts/meta
@@ -39,22 +50,26 @@ git add prompts/meta
 git commit -m "chore: update research-agent metaprompt"
 ```
 
-## エージェントデプロイ方法
+Pinning the submodule commit is intentional. It makes prompt-system changes
+reviewable in the receiving project's own history.
 
-デプロイは `kernel-deploy.md` の Stage 1--4 に従って、受け入れ先プロジェクト内で
-実行します。上流からコピーするのは `kernel-*.md` のメタプロンプトだけです。
-生成済み agent prompt、skill、template、script は各プロジェクトの派生成果物です。
+## Deploying Agents
+
+Agent deployment is performed inside the receiving project, following
+`kernel-deploy.md` Stage 1 through Stage 4. The upstream boundary is strict:
+this repository supplies metaprompt sources only. Generated agent prompts,
+skills, templates, scripts, and project docs are local derived outputs.
 
 ### Codex
 
-Codex 用プロンプトを生成する場合は、受け入れ先プロジェクトで次を実行する意図で
-ResearchArchitect / EnvMetaBootstrapper に渡します。
+To generate Codex-facing prompts and local support artifacts, invoke
+ResearchArchitect / EnvMetaBootstrapper with:
 
 ```text
 Execute EnvMetaBootstrapper Using prompts/meta/kernel-deploy.md Target Codex
 ```
 
-主な生成先:
+Typical generated or updated outputs:
 
 - `prompts/agents-codex/`
 - `prompts/skills/`
@@ -64,19 +79,20 @@ Execute EnvMetaBootstrapper Using prompts/meta/kernel-deploy.md Target Codex
 - `schema_resolution_report.json`
 - `token_telemetry_report.json`
 
-Codex 生成では、patch-oriented work、worktree-first commits、明示的な user request
-がある場合だけの no-ff main merge、既存の `prompts/agents-codex/_base.yaml`
-保持を重視します。
+Codex deployment emphasizes executable clarity, patch-oriented work,
+worktree-first commits, preservation of local runtime settings such as
+`prompts/agents-codex/_base.yaml`, and explicit user approval for no-ff
+`main` merges.
 
 ### Claude
 
-Claude 用プロンプトを生成する場合:
+To generate Claude-facing prompts and local support artifacts, invoke:
 
 ```text
 Execute EnvMetaBootstrapper Using prompts/meta/kernel-deploy.md Target Claude
 ```
 
-主な生成先:
+Typical generated or updated outputs:
 
 - `prompts/agents-claude/`
 - `prompts/skills/`
@@ -86,76 +102,84 @@ Execute EnvMetaBootstrapper Using prompts/meta/kernel-deploy.md Target Claude
 - `schema_resolution_report.json`
 - `token_telemetry_report.json`
 
-Claude 生成では、明示的制約、role narrative、traceability emphasis を重視します。
+Claude deployment emphasizes explicit constraints, role narrative, traceability,
+and careful separation between specialist work and independent verification.
 
-### その他の LLM / 実行環境
+### Other LLM Runtimes
 
-新しい LLM 環境を使う場合は、まず `kernel-deploy.md §ENVIRONMENT PROFILES` に
-その環境のプロファイルを定義し、`prompts/agents-{env}/` を project-local output
-として生成します。生成規則は同じです。
+For another LLM or execution environment, first define an environment profile in
+`kernel-deploy.md` under `ENVIRONMENT PROFILES`, then generate a local
+`prompts/agents-{env}/` directory:
 
 ```text
 Execute EnvMetaBootstrapper Using prompts/meta/kernel-deploy.md Target <env>
 ```
 
-環境ごとの差分は base prompt と runtime constraints に閉じ込め、role contract、
-HAND schema、STOP 条件、P-E-V-A workflow は kernel から共有します。
+Keep runtime-specific differences in the environment base prompt and runtime
+constraints. Role contracts, HAND schemas, STOP conditions, and the P-E-V-A
+workflow should continue to come from the shared kernel files.
 
-## 各ファイルの役割
+## Kernel File Roles
 
 | File | Role |
 |---|---|
-| `kernel-constitution.md` | 研究エージェント系の憲法。φ1--φ7、A1--A11、authority、isolation、source of truth、破れた対称性の検査などを定義します。 |
-| `kernel-roles.md` | ResearchArchitect、TaskPlanner、各 domain agent、Gatekeeper などの role contract、HAND schema、CoVe mandate を定義します。 |
-| `kernel-ops.md` | HAND、GIT、LOCK、AUDIT、K operations、STOP codes など、実行時の手順とプロトコルを定義します。 |
-| `kernel-domains.md` | T/L/E/A/Q/K/P などの research domain、write territory、interface contract、micro-agent 原則を定義します。 |
-| `kernel-workflow.md` | PLAN -> EXECUTE -> VERIFY -> AUDIT の P-E-V-A loop、task classification、dynamic replanning、STOP recovery を定義します。 |
-| `kernel-deploy.md` | EnvMetaBootstrapper の仕様。kernel から project-local docs、agent prompts、skills、validation reports を生成する手順を定義します。 |
-| `kernel-antipatterns.md` | reviewer hallucination、verification theater、scope creep などの anti-pattern catalogue と注入規則を定義します。 |
-| `kernel-project.md` | 利用先プロジェクトの identity、PR-1..PR-6、パス規約、実行規約などを定義する差し替え可能な project profile です。 |
+| `kernel-constitution.md` | The system foundation: phi principles, A-axioms, authority order, isolation levels, source-of-truth rules, and core safety constraints. |
+| `kernel-roles.md` | Role contracts for ResearchArchitect, TaskPlanner, domain agents, gatekeepers, and auditors, including HAND schemas and verification mandates. |
+| `kernel-ops.md` | Operational procedures: HAND, GIT, LOCK, AUDIT, knowledge operations, STOP codes, and reusable execution protocols. |
+| `kernel-domains.md` | Research domain registry, write territories, interface contracts, domain routing, and micro-agent principles. |
+| `kernel-workflow.md` | Process model: PLAN -> EXECUTE -> VERIFY -> AUDIT, task classification, dynamic replanning, debate, and recovery flow. |
+| `kernel-deploy.md` | EnvMetaBootstrapper specification for generating local docs, agent prompts, skill capsules, templates, scripts, and validation reports. |
+| `kernel-antipatterns.md` | Compact anti-pattern catalogue and injection rules for failures such as reviewer hallucination, verification theater, and scope creep. |
+| `kernel-project.md` | Swappable project profile: project identity, PR-1..PR-6, paths, validation commands, and project-specific research constraints. |
 
-## `kernel-project.md` の扱い
+## Editing `kernel-project.md`
 
-`kernel-project.md` は、この kernel をどの研究プロジェクトに適用するかを決める
-プロジェクト固有レイヤです。目的に応じて必ず見直してください。
+`kernel-project.md` is the project-specific profile. Review and edit it for the
+purpose of the receiving project before deploying or redeploying agents.
 
-編集すべき代表項目:
+Common fields to adapt:
 
-- project identity
-- domain-specific rules
-- source / experiment / paper / artifact paths
-- validation commands
-- merge and worktree policy
-- generated docs に反映したい PR-1..PR-6
+- project identity and research focus
+- project-specific rules and forbidden shortcuts
+- source, paper, experiment, artifact, and wiki paths
+- validation commands and remote/local execution policy
+- worktree, lock, branch, commit, and merge policy
+- the PR-1 through PR-6 rules that should appear in generated project docs
 
-重要な原則:
+Important rules:
 
-- rule を変えたいときは、生成済み `docs/00_GLOBAL_RULES.md` や
-  `prompts/agents-{env}/` を直接直さず、まず `kernel-project.md` または該当
-  `kernel-*.md` を直してから再デプロイします。
-- プロジェクトごとに異なる `kernel-project.md` が必要な場合は、submodule を
-  project-specific branch / fork / pinned revision として管理します。
-- `kernel-project.md` は受け入れ先プロジェクトの目的を表すための profile であり、
-  universal kernel の本文にプロジェクト固有ルールを混ぜ込む場所ではありません。
+- Do not change generated files such as `docs/00_GLOBAL_RULES.md` or
+  `prompts/agents-{env}/` to modify policy. Edit `kernel-project.md` or the
+  relevant `kernel-*.md` file, then redeploy.
+- Keep project-specific constraints in `kernel-project.md`; do not mix them
+  into the universal kernel unless the rule is genuinely reusable across
+  projects.
+- If different projects need different profiles, use a project-specific branch,
+  fork, or pinned submodule revision.
+- Treat `kernel-project.md` as part of the receiving project's contract, not as
+  a disposable configuration sample.
 
-## 設計思想
+## Design Philosophy
 
-research-agent の中心思想は、研究作業を「会話の記憶」ではなく、追跡可能な
-外部 artifact と git history に載せることです。
+The kernel is built around the idea that research work should live in durable
+artifacts and Git history, not in the private memory of a chat session.
 
-- **Single Source of Truth**: rule 変更は kernel から始め、生成物は再生成します。
-- **Project-Local Derivation**: 上流は metaprompt だけを配り、agent prompt や skill
-  は各プロジェクトの制約に合わせて生成します。
-- **Broken Symmetry**: 重要な検証は、作成者と独立した verifier が行います。
-- **P-E-V-A**: material output は PLAN、EXECUTE、VERIFY、AUDIT を通します。
-- **Worktree-First**: 変更は隔離された worktree / branch / lock / coherent commit で
-  進めます。
-- **Traceability**: claim、equation、code、experiment、paper、wiki の対応を
-  artifact と ledger に残します。
-- **Token Discipline**: 生成 agent prompt には full operation body を詰め込まず、
-  SkillID と JIT reference で必要時に読む構造にします。
+- **Single Source of Truth**: policy changes start in the kernel, then derived
+  prompts and docs are regenerated.
+- **Project-Local Derivation**: upstream distributes metaprompt sources only;
+  each project generates its own agents, skills, docs, templates, and scripts.
+- **Broken Symmetry**: important claims are verified by an independent role, not
+  by the same specialist that produced them.
+- **P-E-V-A**: material work passes through PLAN, EXECUTE, VERIFY, and AUDIT.
+- **Worktree-First Operation**: writes happen in isolated worktrees, branches,
+  locks, and coherent commits.
+- **Traceability**: claims, equations, code, experiments, paper text, and wiki
+  knowledge should be linked through external artifacts.
+- **Token Discipline**: generated agent prompts should carry compact contracts
+  and JIT references, while full operation bodies stay in kernel files or skill
+  capsules.
 
-この repository は「完成した agent そのもの」ではなく、「プロジェクトごとに正しく
-agent system を作るための kernel」です。受け入れ先プロジェクトでは、まず
-`kernel-project.md` を目的に合わせ、その後 `kernel-deploy.md` に従って環境別に
-デプロイしてください。
+In short: this repository is not the finished agent system. It is the kernel for
+building a project-specific research-agent system. Adapt `kernel-project.md`,
+run the deployment workflow for the target LLM environment, validate the
+generated artifacts, and commit the result in the receiving project.
