@@ -162,7 +162,8 @@ drafting, expansion, related-work, abstract, or substantive revision tasks.
 `SKILL-SCHEME-CODE` is loaded for computational scheme design, numerical
 method development, research-code synthesis, candidate search, or verifier
 handoff tasks.
-`SKILL-PRESENTATION-DECK` is loaded for deck creation or deck review tasks.
+`SKILL-PRESENTATION-DECK` is loaded for deck creation, deck-generation
+project setup, deck export, or deck review tasks.
 `SKILL-PRESENTATION-ILLUSTRATION` is loaded only when a conceptual,
 painting-like, or reverse-readback visual task is active.
 
@@ -200,7 +201,7 @@ Skill Capsule generation manifest:
 | SKILL-PROMPT-AUDIT | `prompts/skills/SKILL-PROMPT-AUDIT.md` | Q3-AUDIT prompt compliance, rule bloat, JIT discipline, and token ROI audit | `kernel-deploy.md §Stage 4` |
 | SKILL-PAPER-WRITING | `prompts/skills/SKILL-PAPER-WRITING.md` | Research-grounded manuscript planning, claim register, focused feedback, bounded revision, and AI-use transparency | `kernel-ops.md §PAPER-WRITE-01` |
 | SKILL-SCHEME-CODE | `prompts/skills/SKILL-SCHEME-CODE.md` | Scientific scheme/code decomposition, SchemeCodePlan, executable candidate evaluation, and verifier-gated handoff | `kernel-ops.md §SCHEME-CODE-01` |
-| SKILL-PRESENTATION-DECK | `prompts/skills/SKILL-PRESENTATION-DECK.md` | Research-grounded staged deck planning, editable generation, render review, talk-track alignment, and source traceability | `kernel-ops.md §PRESENTATION-GEN-01` |
+| SKILL-PRESENTATION-DECK | `prompts/skills/SKILL-PRESENTATION-DECK.md` | Research-grounded deck-project planning, slide-spec management, editable/programmatic generation, render review, talk-track alignment, and source traceability | `kernel-ops.md §PRESENTATION-GEN-01` |
 | SKILL-PRESENTATION-ILLUSTRATION | `prompts/skills/SKILL-PRESENTATION-ILLUSTRATION.md` | Claim abstraction, conceptual concretization, painting-style image language, and reverse-readback fidelity checks | `kernel-ops.md §VISUAL-CONCEPT-01` |
 
 Each generated skill capsule MUST contain: `id`, `purpose`, `trigger`,

@@ -460,10 +460,10 @@ transparency_record:
 </meta_section>
 
 ────────────────────────────────────────────────────────
-<meta_section id="PRESENTATION-GEN-01" version="8.2.0-candidate" axiom_refs="A1,A3,A6,A8,A9,phi5">
+<meta_section id="PRESENTATION-GEN-01" version="8.3.0-candidate" axiom_refs="A1,A3,A6,A8,A9,phi5">
 ## PRESENTATION-GEN-01: Research-Grounded Deck Generation Loop
 
-<purpose>Create presentation decks through staged planning, editable generation, render review, and talk-track alignment instead of direct long-document summarization.</purpose>
+<purpose>Create presentation decks through staged deck-project planning, editable/programmatic generation, render review, and talk-track alignment instead of direct long-document summarization or one-shot PPTX editing.</purpose>
 <authority>PresentationWriter executes for decks; PaperReviewer audits actual rendered output; PaperWorkflowCoordinator may mandate.</authority>
 
 **Research-derived pattern:** multi-stage LLM/VLM workflows, reference schema extraction, editable/programmatic slide sources, visual-in-the-loop review, audience/style personalization, retrieval/source grounding, and cognitive-load control.
@@ -488,22 +488,29 @@ slide_plan:
     speaker_note_intent: {spoken complement, not a text duplicate}
     cognitive_load_risk: low | medium | high
 production_plan:
-  editable_source: {pptx, Slidev/Markdown, LaTeX, or project-local format}
-  asset_policy: {reuse supported figures first; raster artwork only for conceptual assets}
+  deck_project: {brief.md, slide_spec.yaml, data/, assets/, src/, outputs/}
+  editable_source: {pptx objects, Slidev/Markdown, HTML/SVG, LaTeX, or project-local format}
+  asset_policy: {charts from data; diagrams as editable objects or SVG/HTML assets; raster artwork only for conceptual assets}
+  export_targets: [{pptx, pdf, preview_images}]
 render_review:
   rendered_artifacts: [{path}]
-  checks: [content_fidelity, design_coherence, readability, cognitive_load, talk_track_alignment, source_trace]
+  checks: [content_fidelity, design_coherence, readability, cognitive_load, talk_track_alignment, source_trace, editability, chart_axis_legibility, text_density]
   revision_actions: [{slide_id, action}]
 ```
 
 <rules>
 - First extract audience, preference/template signals, source scope, and narrative spine; then generate slides.
+- When the user asks for a finished deck and no stable pipeline exists, create or update the deck-generation project first: `brief.md` for intent, `slide_spec.yaml` for slide claims/visual choices, reproducible data/assets, generation code, exports, and previews.
 - Use reference decks/templates to infer functional slide types and visual style when available; absence is allowed but MUST be recorded.
 - Prefer editable/programmatic slide sources for structure. Do not render an entire editable deck as a flat image unless explicitly requested.
+- Balance PPTX editability and visual quality: keep titles, body text, simple tables, and source notes editable; use SVG/HTML/raster assets for complex diagrams or concept art when this materially improves quality.
 - Each slide has one supported lead message, a source map, and a speaker-note intent that complements rather than duplicates visible text.
+- Charts MUST be reproducible from source data; unknown numeric values become explicit TODO/placeholders rather than invented numbers. Tables are for comparison or decisions, not dense information dumps.
 - Run render review on the actual output, not just the source text. Review dimensions: content fidelity, design coherence, readability, cognitive load, talk-track alignment, and source trace.
+- Review exported previews/PDF/PPTX structure before completion: claim-style titles, text density, chart labels, table size, visual consistency, whitespace, and PowerPoint editability.
 - Manage visual load: relevant visuals may aid learning, but dense or irrelevant visuals are a cognitive-load risk, especially for language-heavy audiences.
 - For painting-like or conceptual images inside slides, call VISUAL-CONCEPT-01 and keep the image as a claim-mapped asset.
+- If parallelizing, split by role or artifact boundary (story/spec, charts, diagrams, deck export, review), not by multiple agents editing the same deck file.
 </rules>
 <stop_conditions>STOP-06, STOP-09</stop_conditions>
 <see_also>kernel-roles.md §PresentationWriter; kernel-roles.md §PaperReviewer; kernel-ops.md §VISUAL-CONCEPT-01</see_also>
