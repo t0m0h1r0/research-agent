@@ -460,7 +460,7 @@ transparency_record:
 </meta_section>
 
 ────────────────────────────────────────────────────────
-<meta_section id="PRESENTATION-GEN-01" version="8.4.0-candidate" axiom_refs="A1,A3,A6,A8,A9,phi5">
+<meta_section id="PRESENTATION-GEN-01" version="8.5.0-candidate" axiom_refs="A1,A3,A6,A8,A9,phi5">
 ## PRESENTATION-GEN-01: Research-Grounded Deck Generation Loop
 
 <purpose>Create presentation decks through staged deck-project planning, editable/programmatic generation, render review, and talk-track alignment instead of direct long-document summarization or one-shot PPTX editing.</purpose>
@@ -472,6 +472,7 @@ transparency_record:
 ```yaml
 deck_id:
 audience_context:
+  audience_profile: {primary, secondary_roles, decision_authority, knowledge_level, cares_about, likely_objections, evidence_needed, language_preference}
   purpose: {talk, lecture, review, defense, pitch}
   decision_or_action:
   current_belief:
@@ -500,31 +501,39 @@ slide_plan:
     speaker_note_intent: {spoken complement, not a text duplicate}
     cognitive_load_risk: low | medium | high
 production_plan:
-  deck_project: {brief.md, story_map.md, slide_spec.yaml, data/, assets/, src/, outputs/, review_report.md}
+  deck_project: {brief.md, audience_profile.yaml, story_map.md, slide_spec.yaml, review_plan.yaml, review_reports/, change_log.md, data/, assets/, src/, outputs/, review_report.md}
   editable_source: {pptx objects, Slidev/Markdown, HTML/SVG, LaTeX, or project-local format}
   asset_policy: {charts from data; diagrams as editable objects or SVG/HTML assets; raster artwork only for conceptual assets}
   export_targets: [{pptx, pdf, preview_images}]
 render_review:
+  review_plan: [{iteration_id, role, lens, input_artifacts, output_report, pass_criteria}]
   rendered_artifacts: [{path}]
   checks: [story_fit, slide_structure, visual_fit, evidence_integrity, accessibility_delivery, content_fidelity, design_coherence, readability, cognitive_load, talk_track_alignment, source_trace, editability, chart_axis_legibility, text_density]
   scorecard: {total_50, threshold: {45: presentable, 35: light_revision, 25: structural_or_visual_revision, below_25: redesign_story_before_slides}}
+  issues: [{issue_id, severity, target_audience, slide_id, problem, audience_impact, proposed_fix, priority, decision, status}]
   revision_actions: [{slide_id, action}]
 ```
 
 <rules>
-- First extract audience decision/action, current belief, desired belief, constraints, preference/template signals, source scope, and narrative spine; then generate slides.
-- When the user asks for a finished deck and no stable pipeline exists, create or update the deck-generation project first: `brief.md` for intent, `story_map.md` for audience transformation and take-home message, `slide_spec.yaml` for slide claims/roles/visual choices, reproducible data/assets, generation code, exports, previews, and `review_report.md`.
+- First extract a concrete `audience_profile.yaml`: primary audience, secondary roles, decision authority, knowledge level, current belief, desired belief, cares/objections, evidence needed, and language preference.
+- Then extract audience decision/action, current belief, desired belief, constraints, preference/template signals, source scope, and narrative spine; then generate slides.
+- When the user asks for a finished deck and no stable pipeline exists, create or update the deck-generation project first: `brief.md` for intent, `audience_profile.yaml`, `story_map.md` for audience transformation and take-home message, `slide_spec.yaml` for slide claims/roles/visual choices, `review_plan.yaml`, reproducible data/assets, generation code, exports, previews, `review_reports/`, `review_report.md`, and `change_log.md`.
 - Do not generate or polish the final deck until `story_map.md` or an equivalent explicit story map exists. If it is missing, produce it before slide generation.
+- Review asks "can this audience understand, believe, and decide?" not "is this deck good?" Use role-specific review lenses: primary audience, skeptic, decision owner, finance, field owner, security/legal/IT, first-time audience, presenter/delivery.
 - Use reference decks/templates to infer functional slide types and visual style when available; absence is allowed but MUST be recorded.
 - Prefer editable/programmatic slide sources for structure. Do not render an entire editable deck as a flat image unless explicitly requested.
 - Balance PPTX editability and visual quality: keep titles, body text, simple tables, and source notes editable; use SVG/HTML/raster assets for complex diagrams or concept art when this materially improves quality.
 - Each slide has one supported lead message, a role in the story, source refs, evidence needed, risk-if-removed, and a speaker-note intent that complements rather than duplicates visible text.
 - For executive or decision decks, use answer-first structure by default: decision/recommendation appears by slide 2 unless the brief explicitly requests exploratory sequencing.
 - Charts MUST be reproducible from source data; unknown numeric values become explicit TODO/placeholders rather than invented numbers. Tables are for comparison or decisions, not dense information dumps.
-- Review in stages: story map first, slide structure second, one-message-per-slide third, visual quality fourth, evidence/data fifth, accessibility/delivery sixth. Fix story gaps before visual polish.
+- Review in staged iterations: audience/decision, story structure, primary-audience, skeptic/objection, Q&A readiness, visual clarity, diff review, and final delivery rehearsal. Fix story gaps before visual polish.
 - Run render review on the actual output, not just the source text. Review dimensions: story fit, content fidelity, design coherence, readability, cognitive load, talk-track alignment, source trace, editability, accessibility, and delivery readiness.
 - Review exported previews/PDF/PPTX structure before completion: claim-style titles, text density, chart labels, table size, visual consistency, whitespace, and PowerPoint editability.
 - `review_report.md` records a 50-point scorecard, top issues, slide-level findings, data/evidence findings, delivery risks, and concrete action items. Scores below 25 require story redesign before more slide generation.
+- Review reports MUST be issue-shaped, not essays: issue_id, severity, target_audience, slide_id, problem, audience_impact, proposed_fix, and status.
+- Do not accept every review comment. Classify fixes as Must/Should/Could/Do-not-fix using audience impact * decision impact * confidence; add slides only when the audience needs them to decide, otherwise merge/delete or move detail to speaker notes/backup.
+- After every revision, update `change_log.md`, compare against the previous iteration, and run a diff review for resolved issues, unresolved issues, newly introduced problems, slide count, text growth, and audience clarity.
+- Q&A/objection reviews produce likely hard questions, answer drafts, evidence slide refs, missing evidence, and whether the answer belongs in the main deck, speaker notes, or backup.
 - Manage visual load: relevant visuals may aid learning, but dense or irrelevant visuals are a cognitive-load risk, especially for language-heavy audiences.
 - For painting-like or conceptual images inside slides, call VISUAL-CONCEPT-01 and keep the image as a claim-mapped asset.
 - If parallelizing, split by role or artifact boundary (story/spec, charts, diagrams, deck export, review), not by multiple agents editing the same deck file.
