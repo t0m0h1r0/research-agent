@@ -737,7 +737,7 @@ git checkout -b dev/{domain}/{agent_id}/{task_id}
 ## GIT-02: Merge Criteria Gate
 Before merge PR, ALL must pass:
 - [ ] All tests green (TEST-01)
-- [ ] Convergence table present if research check changed (PR-3)
+- [ ] Project-required verification/convergence evidence present when research checks changed
 - [ ] Interface contract SIGNED
 - [ ] No STOP codes open
 
@@ -827,11 +827,11 @@ Procedure:
 Examples:
 | branch_slug | id_prefix |
 |---|---|
-| `worktree-ra-ch9-review` | `RA-CH9` |
-| `worktree-ra-ch11-review` | `RA-CH11` |
-| `worktree-ch14-benchmark-bootstrap` | `CH14-BEN` |
-| `worktree-ra-paper-ch4-rewrite` | `RA-PAPER` |
-| `dev-L-CodeArchitect-ch14-pressure` | `L-CODEARC` |
+| `worktree-ra-theory-review` | `RA-THEO` |
+| `worktree-ra-code-review` | `RA-CODE` |
+| `worktree-benchmark-bootstrap` | `BENCH` |
+| `worktree-ra-paper-rewrite` | `RA-PAPER` |
+| `dev-L-CodeArchitect-pressure` | `L-CODEARC` |
 | `researcharchitect-src-refactor-plan` | `RESEARCH` |
 | `worktree-ra-meta-id-namespace` | `RA-META` |
 
@@ -917,7 +917,8 @@ Required output: pass count, fail count, coverage % (if configured). Any failing
 required test emits HAND-02 `status: FAIL` with `stop_code: STOP-13`.
 
 ## TEST-02: Convergence Analysis
-Run reproducibility verification per PR-3:
+Run reproducibility verification per the receiving project's verification rule
+defined in `kernel-project.md` / generated project rules:
 
 | N | L_inf error | slope |
 |---|-------------|-------|
@@ -935,7 +936,8 @@ Acceptance: declared PASS criteria are met, all parameters are recorded, and the
 ```bash
 make run CHECK=analysis/{study}/{script}.py
 ```
-Uses project-local analysis scripts or documented shell commands (PR-5).
+Uses project-local analysis scripts or documented shell commands governed by
+the receiving project's fidelity/reproducibility rules.
 
 Mandatory trace checks before HAND-02:
 - EC-1: Source input paths recorded
@@ -947,7 +949,8 @@ Mandatory trace checks before HAND-02:
 ```bash
 make run CHECK=analysis/{study}/{script}.py
 ```
-All figures saved as PDF (CLAUDE.md §Coding Rules). Results in `analysis/{ch}/results/{name}/`.
+Package results according to the receiving project's output, figure-format, and
+path conventions from `kernel-project.md` / generated project rules.
 
 ────────────────────────────────────────────────────────
 # § AUDIT OPERATIONS
@@ -957,26 +960,27 @@ Performed by Auditor/Gatekeeper before HAND-02 SUCCESS on any deliverable.
 
 | # | Check |
 |---|-------|
-| 1 | Algorithm matches paper equation (PR-5) |
-| 2 | evidence traceability maintained (PR-1) |
-| 3 | No unapproved model substitution in research implementation src/research/ |
+| 1 | Deliverable matches governing specification or signed interface |
+| 2 | Evidence/source traceability maintained |
+| 3 | No unapproved model, method, or implementation substitution under project policy |
 | 4 | reproducibility evidence attached when check changes |
 | 5 | Interface contract SIGNED |
 | 6 | No STOP codes open |
-| 7 | Experiment toolkit used for all infrastructure (PR-4) |
-| 8 | Figures saved as PDF |
+| 7 | Project-specific execution/tooling rules satisfied |
+| 8 | Project-specific output and figure-format rules satisfied |
 | 9 | A3 traceability chain intact (equation → memo → code) |
-| 10 | No deprecated path usage (results/ top-level) |
+| 10 | No deprecated path usage under project path policy |
 
 All 10 must PASS; any FAIL → AUDIT-01 FAIL with item number cited.
 
 ## AUDIT-02: Algorithm Fidelity Audit
-Adversarial check that code matches paper equation exactly (PR-5).
+Adversarial check that implementation behavior matches the governing
+specification, source claim, or signed interface exactly.
 
 Procedure:
-A. Read paper equation from `paper/sections/*.tex`
-B. Read discretisation memo from `docs/memo/*.md`
-C. Independently derive expected code from A+B
+A. Read governing source from the project-configured source artifact path
+B. Read discretisation/design memo or signed interface
+C. Independently derive expected implementation behavior from A+B
 D. Compare derived expectation to actual code diff
 E. Any deviation → FAIL with specific line reference
 
@@ -1093,9 +1097,9 @@ Limits: max 2 replan cycles per task before mandatory user escalation (kernel-an
 | STOP-02 | HARD | HAND-03 Immutable Zone bypassed | Halt; report to ResearchArchitect |
 | STOP-03 | HARD | Branch lock not acquired before write | Halt; acquire lock first |
 | STOP-04 | HARD | Cross-domain write without DOM-01 gate | Halt; run DOM-01 |
-| STOP-05 | HARD | unapproved model substitution in research implementation (PR-1) | Halt; escalate to TheoryAuditor |
+| STOP-05 | HARD | unapproved model, method, or implementation substitution under project policy | Halt; escalate to owning gatekeeper |
 | STOP-06 | HARD | Task not achievable in single session | Decompose; re-dispatch |
-| STOP-07 | SOFT | Convergence check failed (PR-3) | Report; escalate to TheoryAuditor |
+| STOP-07 | SOFT | Verification or convergence check failed under project acceptance criteria | Report; escalate to owning gatekeeper |
 | STOP-08 | SOFT | DEBATE SPLIT — no consensus | Escalate to ResearchArchitect |
 | STOP-09 | SOFT | BUILD-01/02 compile failure | Fix; retry |
 | STOP-10 | HARD | Schema-invalid envelope + worktree profile | REJECT; fix envelope |

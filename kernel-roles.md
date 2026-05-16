@@ -448,7 +448,7 @@ Does NOT produce content. M-Domain Protocol Enforcer (Root Admin archetype).
 
 | Section | Content |
 |---------|---------|
-| DELIVERABLES | SchemeCodePlan when numerical/scientific coding is active, component inventory (src/ ↔ paper equations), gap list, dispatch commands, ACTIVE_LEDGER entries |
+| DELIVERABLES | SchemeCodePlan when numerical/scientific coding is active, component inventory (project implementation paths ↔ governing specifications), gap list, dispatch commands, ACTIVE_LEDGER entries |
 | AUTHORITY | [Gatekeeper] Write IF-AGREEMENT; merge `dev/L/*` → `research-impl` and `dev/E/*` → `evidence` (GA-0..GA-6); dispatch L/E-domain specialists; prepare `research-impl` or `evidence` → `main` PR; GIT-00..05; ACTIVE_LEDGER |
 | CONSTRAINTS | Prepare PR after `dev/L/*` → `research-impl` or `dev/E/*` → `evidence` merge; `main` merge waits for explicit user instruction and no-ff plan; no auto-fix; one dispatch per step (P5); dispatch scheme/code/evidence work only after acceptance tests, write territories, and resource budget are explicit; use ARTIFACT-CONVERGENCE-01 for material or iterative repair/review loops with code/evidence adapters, not presentation artifacts |
 | STOP | Sub-agent `status != SUCCESS` → STOP; TestRunner FAIL → STOP; code/paper conflict → STOP |
@@ -460,8 +460,8 @@ Does NOT produce content. M-Domain Protocol Enforcer (Root Admin archetype).
 | Section | Content |
 |---------|---------|
 | DELIVERABLES | SchemeCodePlan-aligned implementation diff, Python module (docstrings citing eq numbers), pytest file (reproducibility, parameters documented), symbol mapping table, convergence table |
-| AUTHORITY | Write Python/pytest to src/research/; derive reproducibility manufactured solutions |
-| CONSTRAINTS | Run SCHEME-CODE-01 for numerical scheme or research-code tasks; for material/iterative work use ARTIFACT-CONVERGENCE-01 with consumer=verifier/operator and native spec=SchemeCodePlan; start from equations, invariants, and verification plan; no src/core/ modification without docs/memo/ update (A9); no deleting tested code (C2); hand off to TestRunner |
+| AUTHORITY | Write Python/pytest to project-configured implementation and test paths; derive reproducibility manufactured solutions |
+| CONSTRAINTS | Run SCHEME-CODE-01 for numerical scheme or research-code tasks; for material/iterative work use ARTIFACT-CONVERGENCE-01 with consumer=verifier/operator and native spec=SchemeCodePlan; start from equations, invariants, and verification plan; no core implementation modification without docs/memo/ or signed-interface update when project policy requires it; no deleting tested code (C2); hand off to TestRunner |
 | STOP | Paper ambiguity → STOP; ask for clarification |
 
 ## CodeCorrector
@@ -471,7 +471,7 @@ Does NOT produce content. M-Domain Protocol Enforcer (Root Admin archetype).
 | Section | Content |
 |---------|---------|
 | DELIVERABLES | SchemeCodePlan-constrained root cause diagnosis (protocols A–D), minimal fix patch, symmetry error table |
-| AUTHORITY | Read src/research/ + relevant paper equations; run staged experiments; apply targeted patches |
+| AUTHORITY | Read project-configured implementation paths + relevant governing specifications; run staged experiments; apply targeted patches |
 | CONSTRAINTS | A→B→C→D sequence before fix hypothesis; for numerical logic failures, repair under the existing SchemeCodePlan and resource budget; use ARTIFACT-CONVERGENCE-01 to track unresolved/reopened verifier issues when repair iterates; no self-certification — hand off to TestRunner |
 | STOP | Fix not found after all protocols → STOP; report to CodeWorkflowCoordinator |
 
@@ -664,7 +664,7 @@ Release gate for all domains. v6.0.0: applies EVALUATOR-OPTIMIZER rubric (R1-R4)
 |---------|---------|
 | DELIVERABLES | Updated config files (Dockerfile, CI, Makefile, requirements.txt), environment profile docs, reproducibility report |
 | AUTHORITY | Read/write Dockerfile, docker-compose.yml, CI configs, Makefile, requirements.txt; GPU/CUDA changes; LaTeX build fixes |
-| CONSTRAINTS | No modification of src/research/ or paper prose; reproducibility-affecting changes must be documented |
+| CONSTRAINTS | No modification of research implementation paths or paper prose; reproducibility-affecting changes must be documented |
 | STOP | Infrastructure change requires numerical source mod → CodeWorkflowCoordinator; GPU incompatible → STOP |
 
 ## DiagnosticArchitect
