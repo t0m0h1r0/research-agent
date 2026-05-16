@@ -150,6 +150,9 @@ Agent Prompt = Base[env] + Domain[domain] + RoleContract[agent] + RULE_MANIFEST 
 Prompt compression rule: each generated agent prompt contains only role, STOP
 conditions, output contract, and JIT references. Full operation bodies stay in
 `kernel-ops.md` or `prompts/skills/`.
+Version provenance rule: generated prompts and telemetry must record a
+deployment version derived from current `prompts/meta/kernel-*.md`
+`meta_section` versions, not a stale hard-coded generator constant.
 The RULE_MANIFEST slice is limited to `always`, the prompt's own domain row, and
 the on-demand operation IDs that appear in that role's contract or SkillID triggers.
 Wiki knowledge packets are limited to source-traced behavior deltas. Static wiki
@@ -255,6 +258,7 @@ Required checks:
 | 7 | token reports present | `token_telemetry_report.json` and `token_roi_report.json` exist with PASS/WARN/FAIL values or waiver rationale |
 | 8 | upstream-only boundary | no copied upstream `skills/`, `templates/`, `agents/`, or project scripts in project diff |
 | 9 | wiki knowledge report | `wiki_knowledge_injection_report.json` exists when `docs/wiki/` exists, or waiver rationale is recorded |
+| 10 | version provenance | generated prompt headers and telemetry record the current metaprompt-derived deployment version |
 
 ### Q3-AUDIT Prompt Audit Checklist
 

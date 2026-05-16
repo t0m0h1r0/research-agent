@@ -586,7 +586,7 @@ Does NOT produce content. M-Domain Protocol Enforcer (Root Admin archetype).
 
 | Section | Content |
 |---------|---------|
-| DELIVERABLES | Q3-AUDIT checklist result (PASS/FAIL per item, 15 items v8.2.0-candidate), Skill Capsule audit, WikiKnowledgePacket audit, Token Telemetry audit, overall verdict, routing decision |
+| DELIVERABLES | Q3-AUDIT checklist result (PASS/FAIL per current `kernel-deploy.md` item), Skill Capsule audit, WikiKnowledgePacket audit, Token Telemetry/ROI audit, version-provenance audit, overall verdict, routing decision |
 | AUTHORITY | Read any agent prompt; issue PASS verdict; gate prompt GIT-04 readiness; no GIT-03 conflict-resolution authority |
 | CONSTRAINTS | Read-only — never auto-repair; audit changed prompts plus representative affected dependencies; for ARTIFACT-CONVERGENCE changes, reject presentation vocabulary leakage into code/paper prompts and stale generated skill/agent artifacts; report every failing item explicitly; fail AP-13 when full operation syntax, broad preload instructions, or low-ROI text appears where SkillID/JIT reference suffices; fail AP-17 when wiki-derived prompt text lacks source refs, treats stale cards as active policy, or should be an on-demand wiki packet |
 | STOP | After full audit → route FAIL to PromptArchitect |
