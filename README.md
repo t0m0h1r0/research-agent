@@ -45,13 +45,18 @@ git submodule update --init --recursive
 To update the kernel later:
 
 ```sh
-git submodule update --remote prompts/meta
+python scripts/sync_research_agent.py
 git add prompts/meta
 git commit -m "chore: update research-agent metaprompt"
 ```
 
 Pinning the submodule commit is intentional. It makes prompt-system changes
 reviewable in the receiving project's own history.
+
+Use the project sync helper instead of a bare `git submodule update --remote`
+when the receiving project keeps a customized `prompts/meta/kernel-project.md`.
+The helper snapshots that file, updates the shared kernel submodule, then
+restores the snapshot so project-specific rules are not lost during sync.
 
 ## Deploying Agents
 
@@ -130,12 +135,15 @@ workflow should continue to come from the shared kernel files.
 | `kernel-workflow.md` | Process model: PLAN -> EXECUTE -> VERIFY -> AUDIT, task classification, dynamic replanning, debate, and recovery flow. |
 | `kernel-deploy.md` | EnvMetaBootstrapper specification for generating local docs, agent prompts, skill capsules, templates, scripts, and validation reports. |
 | `kernel-antipatterns.md` | Compact anti-pattern catalogue and injection rules for failures such as reviewer hallucination, verification theater, and scope creep. |
-| `kernel-project.md` | Swappable project profile: project identity, PR-1..PR-6, paths, validation commands, and project-specific research constraints. |
+| `kernel-project.md` | User-authored swappable project profile: project identity, PR-1..PR-6, paths, validation commands, and project-specific research constraints. It lives at `prompts/meta/kernel-project.md` in the receiving project and is preserved across submodule sync. |
 
 ## Editing `kernel-project.md`
 
-`kernel-project.md` is the project-specific profile. Review and edit it for the
-purpose of the receiving project before deploying or redeploying agents.
+`prompts/meta/kernel-project.md` is the project-specific profile. The receiving
+project's user owns this file: review and edit it for the purpose of the
+project before deploying or redeploying agents. It intentionally lives next to
+the shared kernel files for simple management, but sync/deploy tooling must
+preserve it as local project state.
 
 Common fields to adapt:
 
@@ -146,6 +154,18 @@ Common fields to adapt:
 - worktree, lock, branch, commit, and merge policy
 - the PR-1 through PR-6 rules that should appear in generated project docs
 
+At minimum, the file should define:
+
+- `META-PROJECT` with the project type, research focus, primary method, and
+  target output
+- PR-1 through PR-6, each with a stable title, rationale, and concrete rule
+- path conventions for source, experiments, results, papers, artifacts, and wiki
+- validation expectations: tests, build commands, remote/local execution policy,
+  and any acceptance thresholds
+- prohibited shortcuts and non-negotiable methodology constraints
+- portability notes explaining what must change when retargeting to a different
+  project
+
 Important rules:
 
 - Do not change generated files such as `docs/00_GLOBAL_RULES.md` or
@@ -154,8 +174,12 @@ Important rules:
 - Keep project-specific constraints in `kernel-project.md`; do not mix them
   into the universal kernel unless the rule is genuinely reusable across
   projects.
-- If different projects need different profiles, use a project-specific branch,
-  fork, or pinned submodule revision.
+- Use the sync helper for submodule updates. It preserves
+  `prompts/meta/kernel-project.md`; a bare submodule checkout may replace files
+  in the submodule worktree.
+- If different projects need different profiles, keep the appropriate
+  `kernel-project.md` content in that receiving project's pinned submodule
+  checkout.
 - Treat `kernel-project.md` as part of the receiving project's contract, not as
   a disposable configuration sample.
 

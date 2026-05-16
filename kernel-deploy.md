@@ -27,7 +27,7 @@
 | kernel-domains.md | generic research domain registry |
 | kernel-workflow.md | P-E-V-A and research pipeline |
 | kernel-antipatterns.md | anti-pattern catalogue |
-| kernel-project.md | current project profile |
+| prompts/meta/kernel-project.md | receiving project's user-owned project profile overlay inside the metaprompt submodule |
 | kernel-deploy.md | this deployment spec |
 | docs/wiki/INDEX.md | project-local compiled knowledge index, if present |
 
@@ -172,7 +172,8 @@ painting-like, or reverse-readback visual task is active.
 Distribution boundary:
 
 - Upstream git pull brings in metaprompt sources only.
-- `kernel-project.md` remains local and is applied during this stage.
+- `prompts/meta/kernel-project.md` remains the receiving project's project profile and is applied during this stage.
+- Although this file lives inside the `prompts/meta` submodule checkout, it is user-owned for the receiving project; submodule sync helpers MUST preserve it.
 - Generated `prompts/agents-*` files are not pulled from upstream; they are
   overwritten only by the receiving project's deployment command.
 
@@ -189,7 +190,7 @@ Codex generation invariants:
 ## Stage 3b - Generate Local Support Artifacts
 
 Generated support artifacts are local derived outputs. They MUST be produced
-from this metaprompt bundle and the receiving project's `kernel-project.md`,
+from this metaprompt bundle and the receiving project's `prompts/meta/kernel-project.md`,
 not copied from upstream.
 
 Skill Capsule generation manifest:
@@ -314,10 +315,12 @@ Machine-readable local Skill Capsule specs. Deployment scripts MUST regenerate
 
 Project template generation contract:
 
-- Generate `prompts/meta/kernel-project.md` only when absent.
+- Generate or copy the editable project profile as `prompts/meta/kernel-project.md` only when absent.
+- The user edits `prompts/meta/kernel-project.md` to retarget the project; deployment MUST treat it as local project state even though it is inside the submodule checkout.
 - The generated project profile MUST contain `META-PROJECT`, project identity,
   and exactly PR-1..PR-6 placeholders.
 - Never overwrite an existing `prompts/meta/kernel-project.md` during update.
+- Submodule sync MUST snapshot `prompts/meta/kernel-project.md`, update the shared kernel, then restore the snapshot before redeploying.
 
 Project script generation contract:
 
@@ -327,7 +330,7 @@ Project script generation contract:
   `scripts/atomic_push.py`, or document equivalent project-local helpers with
   the same LOCK and GIT-ATOMIC-PUSH semantics.
 - Scripts MUST read metaprompt sources from `prompts/meta/`, preserve
-  `kernel-project.md`, regenerate local skills/templates/agents/docs, and write
+  `prompts/meta/kernel-project.md`, regenerate local skills/templates/agents/docs, and write
   a redeploy-required marker after upstream metaprompt updates.
 - Scripts MUST NOT fetch or copy upstream generated prompt artifacts.
 
