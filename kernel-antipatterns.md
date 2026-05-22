@@ -1,13 +1,13 @@
-# kernel-antipatterns.md — Anti-Pattern Library v8.1.0-candidate
+# kernel-antipatterns.md — Anti-Pattern Library v8.8.0-candidate
 # Replaces: meta-antipatterns.md (24KB → ~10KB, -58%).
-# AP-01..AP-17 in compact format (detect/mitigate/severity/inject).
+# AP-01..AP-18 in compact format (detect/mitigate/severity/inject).
 # FOUNDATION: kernel-constitution.md §AXIOMS ← READ FIRST
 #
 # Injection rules: kernel-deploy.md §Stage 3 - Generate Agent Prompts.
 # TIER-1: role-relevant CRITICAL. TIER-2: add role-relevant HIGH. TIER-3: all applicable within budget.
 # Total injection budget: ≤ 200 tokens per agent (LA-4).
 
-<meta_section id="META-ANTIPATTERNS" version="8.1.0-candidate" axiom_refs="A1,phi1,phi7">
+<meta_section id="META-ANTIPATTERNS" version="8.8.0-candidate" axiom_refs="A1,phi1,phi7">
 <purpose>Failure mode catalogue. Agents self-check injected APs before each output. Detection criteria self-checkable in single turn.</purpose>
 <authority>PromptArchitect adds new APs after observing failure in execution. EnvMetaBootstrapper injects per tier and inject list.</authority>
 <rules>
@@ -139,6 +139,13 @@
 **mitigate:** Run kernel-deploy Stage 1b. Distill to a `WikiKnowledgePacket` with one behavior_delta, ACTIVE source refs, target_roles, injection_mode, and token_budget. Use `on_demand` or SkillID for long procedures; mark stale cards as negative knowledge only.
 **severity:** HIGH
 **inject:** ResearchArchitect, PromptArchitect, PromptAuditor, ConsistencyAuditor, KnowledgeArchitect, Librarian, WikiAuditor
+
+────────────────────────────────────────────────────────
+## AP-18: Follow-up Memory Sink *(v8.8.0-candidate)*
+**detect:** Deferred, time-bound, manual, retryable, or externally blocked work is left only in prose, "remember to" language, or a human's memory.
+**mitigate:** Complete cheap in-scope follow-ups now; otherwise record owner, trigger, evidence path, and next_action/issue/automation_candidate via FOLLOWUP-GUARD.
+**severity:** HIGH
+**inject:** ResearchArchitect, TaskPlanner, CodeWorkflowCoordinator, PromptArchitect, PromptAuditor, ConsistencyAuditor, KnowledgeArchitect, WikiAuditor, DevOpsArchitect, DiagnosticArchitect
 
 ────────────────────────────────────────────────────────
 # § SELF-CHECK TABLE (injection format for generated agent prompts)

@@ -421,7 +421,7 @@ convergence_dashboard:
 </meta_section>
 
 ────────────────────────────────────────────────────────
-<meta_section id="SCHEME-CODE-01" version="8.3.0-candidate" axiom_refs="A1,A3,A6,A8,A9,phi5">
+<meta_section id="SCHEME-CODE-01" version="8.4.0-candidate" axiom_refs="A1,A3,A6,A8,A9,phi5">
 ## SCHEME-CODE-01: Scientific Scheme and Code Development Loop
 
 <purpose>Design, implement, and verify computational schemes through decomposed scientific tasks, explicit scheme contracts, executable tests, and verifier-gated iteration.</purpose>
@@ -442,6 +442,10 @@ scheme_spec:
   invariants_or_balances: [{mass, momentum, energy, positivity, monotonicity, symmetry, or null}]
   discretization_choices: [{space, time, coupling, boundary, interface}]
   stability_or_consistency_expectation: {CFL, order, conservation, convergence, or null}
+root_cause_protocol:
+  zero_base_inventory: {equations, physics_math_assumptions, units_scales, invariants, boundaries_interfaces, discrete_objects, observed_contradictions}
+  cause_hypotheses: [{id, theory_basis, prediction, falsifier, probe, verdict}]
+  mitigation_candidates: [{id, theory_basis, expected_effect, evaluator, implementation_scope, verdict}]
 candidate_loop:
   baseline: {existing code path or reference method}
   variants: [{candidate_id, diff_scope, rationale}]
@@ -467,6 +471,11 @@ convergence_control:
 - Use ARTIFACT-CONVERGENCE-01 for material or iterative scheme/code tasks. The native spec remains `SchemeCodePlan`; do not require presentation artifacts.
 - Decompose scientific coding tasks into subproblems before implementation; each subproblem needs an input/output contract and verification target.
 - Scheme design starts from equations, assumptions, invariants, boundary/interface conditions, and expected consistency/stability behavior.
+- For scientific/numerical failures, start from a zero-base problem inventory and first-principles physics/math reasoning before naming the root cause.
+- Generate many plausible cause hypotheses before testing; default to at least three falsifiable hypotheses when non-trivial, or record why fewer are scientifically exhaustive.
+- After root cause identification, generate many theory-grounded mitigation candidates before implementation; default to at least three candidates when non-trivial, or record why fewer are scientifically exhaustive.
+- Each hypothesis and mitigation candidate needs a theory basis, discriminating probe or evaluator, and falsification/acceptance condition.
+- Shortcut/workaround patches are forbidden when they are not derived from governing equations, invariants, or verified contracts.
 - Candidate search or evolutionary coding is allowed only when evaluator metrics are executable, cheap enough for the stated budget, and tied to scientific correctness rather than benchmark score alone.
 - Prefer simple reliable schemes over sophisticated fragile solvers unless tests demonstrate better accuracy/robustness/cost trade-off.
 - Every code change is a bounded diff against declared implementation paths; do not optimize unrelated infrastructure while changing numerical logic.
