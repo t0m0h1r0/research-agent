@@ -77,6 +77,11 @@ T → CheckSpec.md → L → AnalysisAPI_vX.md → E → EvidencePackage/ → A
 **Authority rule:** kernel-constitution.md wins on axiom intent; docs/00_GLOBAL_RULES.md wins on rule
 interpretation; docs/01–02 win on project state.
 
+**Persistent knowledge boundary:** raw sources and external discussions are
+evidence, compiled wiki entries are reviewed memory, and kernel/project docs are
+execution policy. Memory becomes policy only through explicit local SSoT
+promotion with provenance, review state, and invalidation triggers.
+
 ────────────────────────────────────────────────────────
 <immutable_zone id="phi1-phi7" version="7.0.0">
 # § DESIGN PHILOSOPHY

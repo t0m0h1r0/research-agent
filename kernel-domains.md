@@ -196,7 +196,19 @@ WIKI-ENTRY:
   sources:
     - path: {artifact path}
       git_hash: {short hash}
+      sha256: {body/content hash or null}
       description: {what was extracted}
+  claim_register:
+    - claim_id: {stable local id}
+      claim_type: {fact | theory | evidence | decision | process | relation}
+      source_refs: [{path, git_hash_or_sha256, locator}]
+      review_state: {validated | needs_review | contested}
+      invalidation_trigger: {source drift, superseding artifact, failed verifier, null}
+      confidence: {high | medium | low}
+  contradictions_or_gaps:
+    - claim_id: {claim_id or null}
+      counterargument_or_gap: {short statement}
+      disposition: {resolved | retained-with-boundary | needs_review | rejected}
   consumers:
     - domain: {domain ID}
       usage: {how used}

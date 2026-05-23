@@ -615,9 +615,9 @@ Release gate for all domains. v6.0.0: applies EVALUATOR-OPTIMIZER rubric (R1-R4)
 
 | Section | Content |
 |---------|---------|
-| DELIVERABLES | Wiki entries in docs/wiki/{category}/{REF-ID}.md, pointer maps, compilation log, K-candidate promotion decisions |
+| DELIVERABLES | Wiki entries in docs/wiki/{category}/{REF-ID}.md, pointer maps, compilation/triage log, claim register with provenance/review_state, K-candidate promotion decisions |
 | AUTHORITY | Read cited source artifacts, `docs/wiki/INDEX.md`, related wiki entries, and relevant `artifacts/K/`; write to docs/wiki/ and artifacts/K/ only; create new [[REF-ID]] identifiers |
-| CONSTRAINTS | No source modification; no unverified artifacts (non-VALIDATED) in canonical wiki; check existing before creating (K-A3); promote K-candidates only after owning gate validation |
+| CONSTRAINTS | No source modification; compile before writing by diffing against existing entries, contradictions, invalidations, and data gaps; no unverified artifacts (non-VALIDATED) in canonical wiki; LLM-extracted relations default `needs_review` until owning gate validation; check existing before creating (K-A3); promote K-candidates only after owning gate validation |
 | STOP | Source changes during compilation → re-read; circular pointer → TraceabilityManager; source not VALIDATED → STOP |
 
 ## WikiAuditor (K-Domain Gatekeeper)
@@ -626,9 +626,9 @@ Release gate for all domains. v6.0.0: applies EVALUATOR-OPTIMIZER rubric (R1-R4)
 
 | Section | Content |
 |---------|---------|
-| DELIVERABLES | K-LINT report, PASS/FAIL verdict for wiki merge, RE-VERIFY signals |
+| DELIVERABLES | K-LINT report, PASS/FAIL verdict for wiki merge, RE-VERIFY signals for source-fingerprint drift or unresolved review_state |
 | AUTHORITY | [Gatekeeper] Manage `wiki` branch; read submitted entry, INDEX, referenced sources, and affected wiki entries; trigger K-DEPRECATE; approve/reject (KGA-1..5) |
-| CONSTRAINTS | Derive before comparing — never read KnowledgeArchitect reasoning first (MH-3); run K-LINT before approving |
+| CONSTRAINTS | Derive before comparing — never read KnowledgeArchitect reasoning first (MH-3); run K-LINT before approving; ACTIVE durable claims require source provenance, verifier/disposition, and no unresolved `needs_review`/`contested` state |
 | STOP | Broken pointer → STOP-HARD (K-A2); SSoT violation → K-REFACTOR |
 
 ## Librarian
@@ -639,7 +639,7 @@ Release gate for all domains. v6.0.0: applies EVALUATOR-OPTIMIZER rubric (R1-R4)
 |---------|---------|
 | DELIVERABLES | Search results (REF-ID lists), precedent/lesson summary, K-IMPACT-ANALYSIS report (consumer list, cascade depth, affected domains) |
 | AUTHORITY | Read-only: docs/wiki/; report broken pointers to WikiAuditor |
-| CONSTRAINTS | Strictly read-only; search by task terms, artifact names, methods, assumptions, and failure modes; trace ALL consumers (transitive closure) |
+| CONSTRAINTS | Strictly read-only; search by task terms, artifact names, methods, assumptions, failure modes, status/review_state, and source fingerprints; trace ALL consumers (transitive closure); when metadata cannot answer a global/timeline/status query reliably, report a tooling/index gap |
 | STOP | Wiki index corrupted → WikiAuditor; impact cascade > 10 → STOP |
 
 ## TraceabilityManager
