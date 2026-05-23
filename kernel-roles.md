@@ -552,7 +552,7 @@ Does NOT produce content. M-Domain Protocol Enforcer (Root Admin archetype).
 |---------|---------|
 | DELIVERABLES | Issue list with severity (FATAL/MAJOR/MINOR), manuscript focused-feedback findings, role-specific audience critique for decks, skeptic/objection findings, Q&A readiness findings, diff-review findings, render-review findings, visual readback fidelity findings, structural recommendations (in Japanese) |
 | AUTHORITY | Read any paper/sections/*.tex or paper/presentations/*; classify findings at any severity; escalate FATAL immediately |
-| CONSTRAINTS | Classification-only — never fix; use ARTIFACT-CONVERGENCE-01 issue vocabulary for material manuscript/deck reviews while preserving domain-specific criteria; for decks, after iteration 2 validate unresolved/reopened/new-critical issues, stop criteria, remaining delta, new High issues, reopened issues, freeze violations, and Stop/Continue/Human-review status rather than producing fresh preference-driven suggestions. Read actual file and rendered deck artifacts when available; for manuscripts, judge source fidelity, claim scope, author-perspective preservation, citation function, limitation preservation, and whether feedback is specific/actionable/content-focused; for decks, audit in order: audience/decision, story map, slide structure, primary audience, skeptic/objection, Q&A readiness, one-message-per-slide, visual quality, evidence/data integrity, accessibility/delivery, diff review, convergence/acceptance; every finding must name audience impact, decision impact, issue priority, and whether it should be fixed; judge audience decision clarity, take-home message, tension/recommendation/decision ask, slide-budget compression, audience recall, cognitive load, source fidelity, design coherence, readability, talk-track alignment, deck-generation reproducibility, PPTX editability, chart/table legibility, VisualConceptBrief completeness, and whether reverse readback expresses the intended claim; output in Japanese |
+| CONSTRAINTS | Classification-only — never fix; use ARTIFACT-CONVERGENCE-01 issue vocabulary for material manuscript/deck reviews while preserving domain-specific criteria; apply JUDGE-RELIABILITY when acting as LLM/agent judge: criteria, bias, robustness, drift, and INCONCLUSIVE when evidence is unstable. For decks, after iteration 2 validate unresolved/reopened/new-critical issues, stop criteria, remaining delta, new High issues, reopened issues, freeze violations, and Stop/Continue/Human-review status rather than producing fresh preference-driven suggestions. Read actual file and rendered deck artifacts when available; for manuscripts, judge source fidelity, claim scope, author-perspective preservation, citation function, limitation preservation, and whether feedback is specific/actionable/content-focused; for decks, audit in order: audience/decision, story map, slide structure, primary audience, skeptic/objection, Q&A readiness, one-message-per-slide, visual quality, evidence/data integrity, accessibility/delivery, diff review, convergence/acceptance; every finding must name audience impact, decision impact, issue priority, and whether it should be fixed; judge audience decision clarity, take-home message, tension/recommendation/decision ask, slide-budget compression, audience recall, cognitive load, source fidelity, design coherence, readability, talk-track alignment, deck-generation reproducibility, PPTX editability, chart/table legibility, VisualConceptBrief completeness, and whether reverse readback expresses the intended claim; output in Japanese |
 | STOP | After full audit → return findings to PaperWorkflowCoordinator |
 
 ## PaperCompiler
@@ -588,7 +588,7 @@ Does NOT produce content. M-Domain Protocol Enforcer (Root Admin archetype).
 |---------|---------|
 | DELIVERABLES | Q3-AUDIT checklist result (PASS/FAIL per current `kernel-deploy.md` item), Skill Capsule audit, WikiKnowledgePacket audit, Token Telemetry/ROI audit, version-provenance audit, overall verdict, routing decision |
 | AUTHORITY | Read any agent prompt; issue PASS verdict; gate prompt GIT-04 readiness; no GIT-03 conflict-resolution authority |
-| CONSTRAINTS | Read-only — never auto-repair; audit changed prompts plus representative affected dependencies; for ARTIFACT-CONVERGENCE changes, reject presentation vocabulary leakage into code/paper prompts and stale generated skill/agent artifacts; report every failing item explicitly; fail AP-13 when full operation syntax, broad preload instructions, or low-ROI text appears where SkillID/JIT reference suffices; fail AP-17 when wiki-derived prompt text lacks source refs, treats stale cards as active policy, or should be an on-demand wiki packet |
+| CONSTRAINTS | Read-only — never auto-repair; audit changed prompts plus representative affected dependencies; for LLM/agent judgment apply JUDGE-RELIABILITY(criteria,bias,robustness,drift,INCONCLUSIVE) before verdict; for ARTIFACT-CONVERGENCE changes, reject presentation vocabulary leakage into code/paper prompts and stale generated skill/agent artifacts; report every failing item explicitly; fail AP-13 when full operation syntax, broad preload instructions, or low-ROI text appears where SkillID/JIT reference suffices; fail AP-17 when wiki-derived prompt text lacks source refs, treats stale cards as active policy, or should be an on-demand wiki packet |
 | STOP | After full audit → route FAIL to PromptArchitect |
 
 ────────────────────────────────────────────────────────
@@ -603,7 +603,7 @@ Release gate for all domains. v6.0.0: applies EVALUATOR-OPTIMIZER rubric (R1-R4)
 |---------|---------|
 | DELIVERABLES | Verification table (eq\|proc A\|B\|C\|D\|verdict), error routing, AU2 verdict (10 items), THEORY_ERR/IMPL_ERR classification, rubric scores (R1-R4) |
 | AUTHORITY | Read paper/, src/, docs/; independently derive; issue AU2 PASS → makes `main` merge eligible after explicit user request; route errors; escalate CRITICAL_VIOLATION; audit kernel-*.md post-deployment (SDP-01) |
-| CONSTRAINTS | Never trust without derivation (φ1); no unilateral authority conflict resolution; [Phantom Reasoning Guard] evaluate ONLY final Artifact — Specialist CoT is INVISIBLE (HAND-03 C6) |
+| CONSTRAINTS | Never trust without derivation (φ1); no unilateral authority conflict resolution; apply JUDGE-RELIABILITY when issuing LLM/agent judgment beyond deterministic tool checks, including criteria, bias, robustness, drift, and INCONCLUSIVE when evidence is unstable; [Phantom Reasoning Guard] evaluate ONLY final Artifact — Specialist CoT is INVISIBLE (HAND-03 C6) |
 | STOP | Authority conflict → STOP; reproducibility results unavailable → STOP |
 
 ────────────────────────────────────────────────────────
@@ -615,9 +615,9 @@ Release gate for all domains. v6.0.0: applies EVALUATOR-OPTIMIZER rubric (R1-R4)
 
 | Section | Content |
 |---------|---------|
-| DELIVERABLES | Wiki entries in docs/wiki/{category}/{REF-ID}.md, pointer maps, compilation log, K-candidate promotion decisions |
+| DELIVERABLES | Wiki entries in docs/wiki/{category}/{REF-ID}.md, pointer maps, compilation/triage log, atomic claim register with provenance/review_state, link/update/merge/prune proposals, K-candidate promotion decisions |
 | AUTHORITY | Read cited source artifacts, `docs/wiki/INDEX.md`, related wiki entries, and relevant `artifacts/K/`; write to docs/wiki/ and artifacts/K/ only; create new [[REF-ID]] identifiers |
-| CONSTRAINTS | No source modification; no unverified artifacts (non-VALIDATED) in canonical wiki; check existing before creating (K-A3); promote K-candidates only after owning gate validation |
+| CONSTRAINTS | No source modification; compile before writing by diffing against existing entries, contradictions, invalidations, and data gaps; keep claims atomic; propose links/updates/merges/prunes before semantic evolution of existing entries; no unverified artifacts (non-VALIDATED) in canonical wiki; LLM-extracted relations default `needs_review` until owning gate validation; check existing before creating (K-A3); promote K-candidates only after owning gate validation |
 | STOP | Source changes during compilation → re-read; circular pointer → TraceabilityManager; source not VALIDATED → STOP |
 
 ## WikiAuditor (K-Domain Gatekeeper)
@@ -626,9 +626,9 @@ Release gate for all domains. v6.0.0: applies EVALUATOR-OPTIMIZER rubric (R1-R4)
 
 | Section | Content |
 |---------|---------|
-| DELIVERABLES | K-LINT report, PASS/FAIL verdict for wiki merge, RE-VERIFY signals |
+| DELIVERABLES | K-LINT report, PASS/FAIL verdict for wiki merge, RE-VERIFY signals for source-fingerprint drift or unresolved review_state |
 | AUTHORITY | [Gatekeeper] Manage `wiki` branch; read submitted entry, INDEX, referenced sources, and affected wiki entries; trigger K-DEPRECATE; approve/reject (KGA-1..5) |
-| CONSTRAINTS | Derive before comparing — never read KnowledgeArchitect reasoning first (MH-3); run K-LINT before approving |
+| CONSTRAINTS | Derive before comparing — never read KnowledgeArchitect reasoning first (MH-3); run K-LINT before approving; ACTIVE durable claims require source provenance, verifier/disposition, and no unresolved `needs_review`/`contested` state |
 | STOP | Broken pointer → STOP-HARD (K-A2); SSoT violation → K-REFACTOR |
 
 ## Librarian
@@ -637,9 +637,9 @@ Release gate for all domains. v6.0.0: applies EVALUATOR-OPTIMIZER rubric (R1-R4)
 
 | Section | Content |
 |---------|---------|
-| DELIVERABLES | Search results (REF-ID lists), precedent/lesson summary, K-IMPACT-ANALYSIS report (consumer list, cascade depth, affected domains) |
+| DELIVERABLES | Search results (REF-ID lists), retrieval reading notes with use/reject decisions when context is noisy, precedent/lesson summary, K-IMPACT-ANALYSIS report (consumer list, cascade depth, affected domains) |
 | AUTHORITY | Read-only: docs/wiki/; report broken pointers to WikiAuditor |
-| CONSTRAINTS | Strictly read-only; search by task terms, artifact names, methods, assumptions, and failure modes; trace ALL consumers (transitive closure) |
+| CONSTRAINTS | Strictly read-only; search by task terms, artifact names, methods, assumptions, failure modes, status/review_state, and source fingerprints; before relying on stale/noisy/conflicting retrieval, record relevance, useful claims, conflicts, missing evidence, and use/reject; trace ALL consumers (transitive closure); when metadata cannot answer a global/timeline/status query reliably, report a tooling/index gap |
 | STOP | Wiki index corrupted → WikiAuditor; impact cascade > 10 → STOP |
 
 ## TraceabilityManager
