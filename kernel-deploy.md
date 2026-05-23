@@ -201,6 +201,10 @@ Agent Prompt = Base[env] + Domain[domain] + RoleContract[agent] + RULE_MANIFEST 
 Prompt compression rule: each generated agent prompt contains only role, STOP
 conditions, output contract, and JIT references. Full operation bodies stay in
 `kernel-ops.md` or `prompts/skills/`.
+Common guard text MUST be compact and role-scoped. In particular, `SCI-ROOT`
+appears only on agents that can directly diagnose or judge scientific/numerical
+failure; other agents rely on routing/JIT references instead of paying static
+tokens for a non-native protocol.
 Prompt wording efficiency rule: generated prompts MUST prefer compact
 behavior-bearing clauses over explanatory filler. Fallback fields must be short
 and actionable; repeated workflow text should be represented as a compact
@@ -387,7 +391,8 @@ Generated prompt audits compare expected benefit against token cost:
   `Must-fix`, validation, `residual_risk`, `waiver_reason`), scientific
   root-cause defaults (`SCI-ROOT`, zero-base, first-principles, physics, math,
   `cause_hypotheses`, falsifiers, `mitigation_candidates`, evaluators, no
-  shortcut), forbidden contradiction patterns, and silent-truncation findings.
+  shortcut) only when `SCI-ROOT` is present/role-relevant, forbidden
+  contradiction patterns, and silent-truncation findings.
 - MUST fail contract integrity when a prompt contains silent `...` truncation;
   any shortened critical role contract must carry an explicit `FULL_REF` to the
   metaprompt source.
