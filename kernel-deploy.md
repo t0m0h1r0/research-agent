@@ -138,6 +138,7 @@ Generated docs:
 | docs/03_PROJECT_RULES.md | generated PR-1..PR-6 from kernel-project.md |
 | prompts/README.md | generated prompt-system guide |
 | AGENTS.md | lightweight external-agent instructions |
+| CLAUDE.md | lightweight Claude Code instructions; same policy as AGENTS.md with Claude runtime pointers |
 | prompts/skills/*.md | generated local JIT skill capsules |
 | templates/ | generated local project templates, if the project keeps templates |
 | scripts/ | generated local deployment/audit helpers, if the project keeps scripts |
@@ -156,6 +157,21 @@ AP row is a deployment failure, not a documentation nit.
   `main` merge guardrails;
 - anomaly-detection research claim gates and Python experiment standard;
 - prompt-maintenance path back to `prompts/meta/` and `prompts/skills/`.
+
+`CLAUDE.md` / `AGENTS.md` policy:
+
+- Treat both files as generated entrypoint bootloaders, not evolving memory.
+- They may contain authority order, budget rules, JIT read order, worktree/git
+  guards, external-tool trust boundary, and validation route pointers.
+- They must not contain paper-specific long knowledge, mutable session lessons,
+  broad wiki prose, or copied external prompt schemas.
+- Durable lessons belong in `docs/wiki/` through K-COMPILE with provenance and
+  review_state; the entrypoints should point to the active retrieval gate.
+- `CLAUDE.md` and `AGENTS.md` must not diverge in policy. Runtime-specific text
+  is limited to which generated role prompt surface to consult
+  (`prompts/agents-claude/` vs `prompts/agents-codex/`) and tool affordance notes.
+- Any generated entrypoint that mentions review, judgment, or acceptance must
+  point to SKEPTIC/JUDGE-RELIABILITY rather than embedding long rubrics.
 
 ## Stage 3 - Generate Agent Prompts
 
