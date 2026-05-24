@@ -1,154 +1,175 @@
-# kernel-project.md — Project-Specific Profile v7.0.0
-# Replaces: meta-project.md (version bump + file references updated to kernel-*.md).
-# ABSTRACT LAYER — PROJECT: rules, conventions, and constraints specific to THIS research project.
+# kernel-project.md - Project-Specific Profile v7.0.0
+# ABSTRACT LAYER - PROJECT: rules, conventions, and constraints specific to THIS project.
 # This file is the SINGLE SOURCE OF TRUTH for project-specific rules.
 #
 # Separation principle:
-#   - kernel-constitution.md → Universal axioms (A1–A11, φ1–φ7) — valid for ANY project
-#   - kernel-domains.md      → Domain framework (T/L/E/A structure) — valid for ANY multi-domain project
-#   - kernel-project.md      → THIS file: project-type + project-instance rules — swap this to change project
+#   - kernel-constitution.md -> Universal axioms valid for ANY project
+#   - kernel-domains.md      -> Domain framework valid for ANY multi-domain project
+#   - kernel-project.md      -> THIS file: project-type + project-instance rules
 #
 # Derived output: docs/03_PROJECT_RULES.md (generated, not manually edited)
-# FOUNDATION: kernel-constitution.md §AXIOMS  ← READ FIRST
+# FOUNDATION: kernel-constitution.md §AXIOMS
 
 <meta_section id="META-PROJECT" version="7.0.0" axiom_refs="phi6,A7,A10">
-<purpose>Project-specific profile (PR-1…PR-6). Swappable by design — replacing this file and regenerating `docs/03_PROJECT_RULES.md` retargets the entire ecosystem at a new research project without touching universal files.</purpose>
-<authority>The Root Admin (ResearchArchitect) edits this file only when onboarding a new project type or instance. All other agents consult `docs/03_PROJECT_RULES.md` (generated from this file).</authority>
+<purpose>Project-specific profile (PR-1...PR-6). Swappable by design: replacing this file and regenerating `docs/03_PROJECT_RULES.md` retargets the local agent ecosystem without touching universal files.</purpose>
+<authority>The Root Admin (ResearchArchitect) edits this file only when onboarding or materially retargeting the project. All other agents consult `docs/03_PROJECT_RULES.md` generated from this file.</authority>
 <rules>
-- MUST NOT reference project-specific rules from kernel-constitution.md / kernel-domains.md / kernel-ops.md (separation principle — keep universal files project-agnostic).
+- MUST NOT reference project-specific rules from kernel-constitution.md / kernel-domains.md / kernel-ops.md.
 - MUST regenerate `docs/03_PROJECT_RULES.md` after any PR-{N} edit.
-- PR-IDs are LOCAL to this file — do not clash with A-{N} (axioms), C-{N} (code), P-{N} (paper), Q-{N} (prompt), AU-{N} (audit).
+- PR-IDs are LOCAL to this file; do not clash with A-{N}, C-{N}, P-{N}, Q-{N}, or AU-{N}.
 </rules>
 <see_also>docs/03_PROJECT_RULES.md (generated), kernel-constitution.md §A, kernel-deploy.md §Stage 2</see_also>
 
-────────────────────────────────────────────────────────
+--------------------------------------------------------
 # § PROJECT IDENTITY
 
 | Field | Value |
 |-------|-------|
-| Project type | Computational Fluid Dynamics (CFD) research |
-| Research focus | Two-phase incompressible flow with the CCD family (CCD/FCCD/UCCD/DCCD) |
-| Primary method | CCD-family compact schemes for spatial discretisation |
-| Solver architecture | Projection method (IPC) + CCD-based PPE |
-| Target output | Doctoral thesis (LaTeX) + reproducible experiment suite |
+| Project type | Web data collection, normalization, and searchable local datastore |
+| Product name | WindDB |
+| Source focus | Publicly accessible listing information on `cityheaven.net` and related CityHeaven-hosted pages |
+| Initial MVP target | `https://www.cityheaven.net/kanagawa/A1401/A140103/moecosu/` |
+| Primary method | Polite, provenance-preserving crawling plus parser-tested extraction into purpose-fit databases |
+| Core entities | Area, shop, listed woman/profile, profile attributes, introduction text, work schedule, diary post, crawl snapshot, source URL |
+| Target output | Searchable local application/API that improves discovery across profile text, diary text, body-size fields, schedule availability, and update history |
 
-────────────────────────────────────────────────────────
-# § PR — Project-Specific Rules
+--------------------------------------------------------
+# § PR - Project-Specific Rules
 
-These rules apply to all agents working within this project. They are NOT universal —
-they derive from the research methodology, solver architecture, and tooling decisions
-specific to this CFD project. When this project ends or a new project begins, this file
-is replaced; the universal system (kernel-constitution.md, kernel-domains.md) remains unchanged.
+These rules apply to all agents working within this project. They are not
+universal; they derive from the data source, adult-directory context, and the
+need to keep crawling lawful, polite, auditable, and update-safe.
 
-## PR-1 — CCD Primacy (FD Usage Policy)
+## PR-1 - Crawl Boundary and Source Respect
 
-This is a CCD-family research project. CCD, FCCD, UCCD, and DCCD are the
-primary spatial operators for ALL solver components. FCCD/UCCD/DCCD were
-introduced to keep the research programme inside the CCD family; do not replace
-them with WENO as a convenience fix.
+WindDB collects only information that is publicly accessible without login,
+payment, captcha bypass, private API abuse, or technical evasion.
 
-| Context | CCD-family role | FD role | WENO role |
-|---------|-----------------|---------|-----------|
-| Solver core (`src/twophase/`) | Primary — all spatial operators | Forbidden | Forbidden unless explicitly approved as legacy/reference |
-| Experiment scripts | Primary | Labeled comparison baseline only | Labeled baseline only, never production ch13 |
-| Paper narrative | Central method | Reference for comparison | Historical/comparison method only |
+| Concern | Rule |
+|---------|------|
+| Allowed source | Start with `https://www.cityheaven.net/kanagawa/A1401/A140103/moecosu/`; then expand only to same-pattern CityHeaven public listing/profile/diary/schedule pages after parser and policy checks pass |
+| Forbidden source | Logged-in member pages, private messages, keep/history state, paid/private content, bypassed anti-bot responses, and pages disallowed by robots or site policy |
+| Crawl discovery | For the MVP, use the `moecosu` shop page as the seed, discover the female list/profile links below it, then discover diary/schedule links from those profiles; broader sitemap/index discovery comes after this seed works |
+| Crawl behavior | Identify the crawler, rate-limit per host, back off on 403/429/5xx, preserve robots and policy check evidence, and never retry aggressively |
+| Parser safety | Treat HTML as untrusted input; sanitize persisted text and never execute scraped scripts |
 
-FD (finite difference) solvers/operators may appear in experiment scripts **only as labeled
-comparison baselines**, never as proposed fixes or solutions to CCD-related issues.
-WENO follows the same restriction and must not be selected in ch13 production
-YAMLs. If monotonicity or upwinding is needed, design the remedy as FCCD/UCCD/DCCD.
+Before any production crawl, agents MUST record the current robots.txt and
+site-policy review in `docs/evidence/` or an equivalent audit artifact. As of
+the 2026-05-24 review, public robots data for `cityheaven.net` records a
+redirect to `www.cityheaven.net`, lists a sitemap, and disallows multiple
+shop-list query variants; the membership terms found on a CityHeaven-hosted
+page limit provided data to personal/private use and disallow other secondary
+use. These observations are constraints to re-check, not permanent permission.
+If the `moecosu` seed returns an anti-bot, age-gate, forbidden, or unstable
+response, stop and record the blocker rather than adding bypass behavior.
 
-## PR-2 — Implicit Solver Policy
+## PR-2 - Purpose-Fit Database Selection
 
-**CCD PPE indefiniteness (2026-04-15):** CCD 1D D2 matrix has 2 wrong-sign
-eigenvalues (modes k=N-1, N) per axis. The Kronecker-product PPE operator is
-therefore indefinite. CCD-LU blows up for general RHS; DC+FD-LU stalls at
-O(h²). See `project_ccd_ppe_indefinite.md` for derivation.
+Database choice is an architectural decision per workload, not a fixed default.
+Every storage change MUST document why the selected DB matches query patterns,
+update cadence, and operational complexity.
 
-| System Type | Primary Solver | Notes |
-|-------------|---------------|-------|
-| Global PPE (ch11 component tests) | CCD Kronecker + direct LU | "ccd_lu"; smooth-RHS only; **NOT for integration tests** |
-| Global PPE (ch12/ch13 integration) | FD 5-point Laplacian + spsolve | negative-definite; stable for arbitrary RHS |
-| Global PPE (production, via Builder) | DC sweep or FD spsolve | per SolverConfig; never CCD Kronecker+LU |
-| Banded/block-tridiag (CCD) | Direct LU | O(N) fill-in; efficient |
+| Workload | Preferred local/default option | Scale-out option | Notes |
+|----------|--------------------------------|------------------|-------|
+| Canonical entities and relationships | SQLite with migrations for local single-user use | PostgreSQL | Normalize shops, profiles, schedules, diaries, and crawl snapshots; use stable source IDs and URLs |
+| Full-text search | SQLite FTS5 for small/local deployments | PostgreSQL `tsvector`/`pg_trgm`, Meilisearch, or OpenSearch | Japanese tokenization/search quality MUST be evaluated with representative diary/profile queries |
+| Raw crawl snapshots | Filesystem/object store plus DB metadata | S3-compatible object store | Store HTML/text hashes and fetch metadata for diff/debug; avoid storing unnecessary binary media |
+| Change history | Relational history tables | Append-only event table or warehouse | Track first_seen, last_seen, content_hash, source_url, parser_version, and extraction confidence |
+| Analytics/export | SQL views/materialized views | Dedicated warehouse only if needed | Derived indexes must be reproducible from canonical data |
 
-**Policy:** CCD Kronecker+LU (`PPESolverCCDLU`) is restricted to ch11
-component-level unit tests with smooth manufactured RHS. For ch12+ integration
-simulations (droplet, RT, etc.), use FD PPE (`PPEBuilder` + `spsolve`) or
-DC sweep. FVM-based iterative solvers (BiCGSTAB) remain deprecated.
+Do not add a new datastore because it is fashionable. Add it only when a named
+query or operational requirement cannot be met cleanly by the current stack.
 
-## PR-3 — MMS Verification Standard
+## PR-3 - Profile, Schedule, and Diary Extraction
 
-All new numerical modules must be verified by Method of Manufactured Solutions (MMS):
+Extraction starts from the `moecosu` female list page, follows each listed profile, and
+stores structured facts with source provenance. Extractors MUST be fixture-tested
+against saved HTML samples before production runs.
 
-| Parameter | Value |
-|-----------|-------|
-| Grid sizes | N = [32, 64, 128, 256] |
-| Required output | Convergence table (N \| L_inf error \| log-log slope) |
-| Acceptance criterion | All slopes >= expected_order - 0.2 |
-| CCD boundary-limited orders | d1 >= 3.5, d2 >= 2.5 on L_inf (ASM-004) |
+| Source area | Required extraction |
+|-------------|---------------------|
+| Female list page | Shop, area, listing URL, profile URL, display name, listing order, listing status, thumbnail URL/hash when needed |
+| Profile page | Display name, shop, public profile attributes, body-size fields when present, introduction/self-introduction text, tags/categories, source URL |
+| Schedule page/block | Work date, start/end time, status labels, shop, profile, source timestamp, normalization timezone |
+| Diary list/detail | Diary title, body text, posted_at, updated_at when visible, related profile/shop, media URL/hash metadata when needed, source URL |
 
-## PR-4 — Experiment Infrastructure Toolkit
+Extraction MUST NOT infer real-world identity, contact details, health status,
+or sensitive facts that are not explicitly published in the source. Images and
+videos are not a primary target; store URLs, hashes, dimensions, and provenance
+only when necessary for deduplication or UI display.
 
-Experiment scripts (`experiment/ch{N}/*.py`) MUST use `twophase.experiment`
-(`src/twophase/experiment/`) for all non-numerical infrastructure.
+The first acceptance fixture is the `moecosu` seed: one crawl run should produce
+shop metadata, discovered profile URLs, profile records, schedule records when
+present, diary records when present, and a search index update without duplicate
+records on the second run. Other shops/attached sources are out of scope until
+that fixture passes.
 
-| Concern | Toolkit API | Replaces |
-|---------|------------|----------|
-| Matplotlib setup | `apply_style()` | `matplotlib.use("Agg")` + inline fontsize/dpi |
-| Output directory | `experiment_dir(__file__)` | pathlib / mkdir boilerplate |
-| `--plot-only` argparse | `experiment_argparser(desc)` | manual ArgumentParser |
-| NPZ save | `save_results(path, dict)` | manual flatten + np.savez |
-| NPZ load | `load_results(path)` | manual np.load + scalar restore |
-| PDF figure save | `save_figure(fig, path)` | fig.savefig(dpi=150, bbox_inches="tight") |
-| 2D field panel | `field_panel(ax, X, Y, field, ...)` | pcolormesh + contour + colorbar |
-| Convergence plot | `convergence_loglog(ax, hs, errors)` | loglog + reference slopes |
-| Time series | `time_history(ax, series)` | semilogy + grid + legend |
-| LaTeX table | `latex_convergence_table(path, results, cols)` | manual tabular formatting |
-| Summary box | `summary_text(fig, rows)` | fig.text(family="monospace") |
-| Colors/markers | `COLORS`, `MARKERS`, `LINESTYLES` | ad-hoc hex codes |
-| Figure sizing | `figsize_grid(nrows, ncols)` | magic-number tuples |
+## PR-4 - Search Semantics and Index Quality
 
-Custom matplotlib calls remain allowed for domain-specific plot logic.
-Direct reimplementation of toolkit concerns = A1 (Token Economy) violation.
+The product goal is better searchability across profile, diary, body-size, and
+schedule information without losing provenance or freshness.
 
-## PR-5 — Algorithm Fidelity
+| Search need | Required behavior |
+|-------------|-------------------|
+| Text search | Search introduction text, diary title/body, tags, shop, and area; support Japanese text normalization and synonym handling where useful |
+| Attribute search | Query height/body-size fields and other structured profile attributes with numeric/range filters when parse confidence is sufficient |
+| Schedule search | Query date/time availability, current/upcoming shifts, and shop/area filters; expired schedules must not appear as current |
+| Freshness search | Expose last_crawled_at, last_changed_at, and source URL for each result |
+| Explainability | Search results must show which field matched and link back to the source/provenance record |
 
-Fixes MUST restore paper-exact behavior. Any deviation from the published/derived algorithm
-is classified as a bug, not a design choice. The paper equation is the specification;
-the code is the implementation.
+Any ranking change MUST be tested with a small evaluation set of realistic
+queries. Full-text improvements should be measured by recall/precision notes or
+side-by-side result examples, not by intuition alone.
 
-**A3 chain (project-specific instance):**
-```
-Paper equation (paper/sections/*.tex)
-  → Discretisation memo (docs/memo/*.md)
-  → Code implementation (src/twophase/)
-  → Experiment verification (experiment/ch{N}/)
-```
+## PR-5 - Update, Diff, and Idempotency Policy
 
-## PR-6 — PPE Policy: No LGMRES for PPE
+Crawls are incremental and idempotent. Re-running the same crawl should update
+changed records, preserve history, and avoid duplicating profiles or diaries.
 
-PPE must use defect correction (DC k=3) + LU direct solve per §8c.
-LGMRES is prohibited for PPE due to convergence instability with CCD operators.
+| Case | Required handling |
+|------|-------------------|
+| New profile/diary/schedule | Insert canonical record and initial snapshot |
+| Changed source content | Update current record, write history row, retain old content hash and parser version |
+| Removed or missing content | Mark as not_seen/tombstoned only after a configured confirmation window; do not hard-delete by default |
+| Parser change | Record parser_version and allow re-extraction from raw snapshots |
+| Partial fetch failure | Preserve previous good data, record fetch error, and retry only under crawl budget/backoff rules |
 
-**Chapter scope (2026-04-15):**
-- ch11 (component tests): CCD Kronecker+LU allowed for smooth manufactured RHS
-- ch12+ (integration tests): FD PPE (`PPEBuilder`+`spsolve`) or DC sweep only
-- `PPESolverCCDLU` must NOT appear in ch12+ integration scripts
+Every mutable table needs stable uniqueness constraints such as source_url,
+source_site_id, shop/profile IDs when available, and normalized timestamps for
+diary/schedule records. Updates MUST be transaction-safe.
 
-────────────────────────────────────────────────────────
+## PR-6 - Compliance, Privacy, and Operational Safety
+
+This project handles adult-directory listing data and must be conservative by
+default. Technical success is invalid if collection violates source policy,
+privacy expectations, or operational safety.
+
+| Risk | Project rule |
+|------|--------------|
+| Site policy drift | Re-check robots.txt, sitemap, relevant terms, and anti-bot responses before production crawling and after sustained failures |
+| Secondary use and copyright | Do not republish scraped text/images wholesale; keep data for local search/indexing unless explicit permission and legal review exist |
+| Personal data | Minimize stored fields, encrypt/limit access where appropriate, provide deletion/suppression workflow, and do not enrich with external identity data |
+| Adult-content context | Keep age-gate assumptions explicit; never collect or surface data suggesting minors; stop and escalate on any underage/high-school indication |
+| Load and reliability | Use crawl budgets, per-host concurrency limits, randomized polite delays, conditional requests when supported, and circuit breakers |
+| Security | Secrets stay out of git; raw HTML is untrusted; admin/search endpoints must avoid leaking full raw snapshots unnecessarily |
+| Auditability | Keep source URL, fetch time, parser version, hash, and robots/policy evidence for data that drives search results |
+
+Similar systems should be treated as cautionary references: search quality,
+deduplication, update detection, opt-out handling, and anti-bot respect matter
+as much as extraction coverage. Do not optimize for maximum scrape volume before
+the provenance, deletion, and freshness model is correct.
+
+--------------------------------------------------------
 # § PORTABILITY NOTES
 
-To adapt this system for a different project:
+To adapt this system for a different data-collection project:
 
-1. Replace this file (kernel-project.md) with project-appropriate PR-rules
-2. Regenerate docs/03_PROJECT_RULES.md from the new kernel-project.md
-3. Update _base.yaml `project_rules` reference if PR-IDs change
-4. Universal files (kernel-constitution.md, kernel-domains.md, kernel-ops.md, etc.) require NO changes
-5. **Verification (EnvMetaBootstrapper Stage 2):** After regeneration, confirm all PR-IDs
-   referenced in _base.yaml exist in the new docs/03_PROJECT_RULES.md:
-   `grep -c "^## PR-" docs/03_PROJECT_RULES.md` must equal the count defined in kernel-project.md.
+1. Replace this file with project-appropriate PR rules.
+2. Regenerate `docs/03_PROJECT_RULES.md` and agent prompts.
+3. Re-evaluate robots, terms, privacy, datastore, and search-quality rules for the new source.
+4. Keep universal files (`kernel-constitution.md`, `kernel-domains.md`, `kernel-ops.md`) unchanged unless the reusable kernel itself needs a general rule.
+5. Confirm `grep -c "^## PR-" docs/03_PROJECT_RULES.md` equals the six PR rules defined here.
 
-The PR-{N} numbering is local to this file. Universal rules use A-{N} (axioms),
-C-{N} (code, universal), P-{N} (paper), Q-{N} (prompt), AU-{N} (audit).
+The PR-{N} numbering is local to this file. Universal rules use A-{N}, C-{N},
+P-{N}, Q-{N}, and AU-{N}.
 </meta_section>
